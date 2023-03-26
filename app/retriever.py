@@ -17,8 +17,13 @@ def parse_xml_to_obj(dict):
     instances = []
     
     instancesXml = dict['application']['instance']
-    for instanceXml in instancesXml:
-        instances.append(App(host=instanceXml['ipAddr'], port=instanceXml['port']['#text']))
+    
+    if not isinstance(instancesXml, list):
+        instances.append(App(host=instancesXml['ipAddr'], port=instancesXml['port']['#text']))
+    
+    else:
+        for instanceXml in instancesXml:
+            instances.append(App(host=instanceXml['ipAddr'], port=instanceXml['port']['#text']))
         
     return instances
 
