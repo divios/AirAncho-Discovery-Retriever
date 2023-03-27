@@ -31,7 +31,7 @@ def parse_xml_to_obj(dict):
 
 def remove_own_instance(peers: list[App]):
     def is_own_instance(peer: App):
-        return peer.host == '10.43.1.182' and peer.port == OWN_PORT
+        return peer.host == OWN_HOST and peer.port == OWN_PORT
     
     return [peer for peer in peers if not is_own_instance(peer)]
 
