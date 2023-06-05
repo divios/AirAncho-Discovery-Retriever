@@ -17,40 +17,42 @@ class App(object):
 
 def parse_xml_to_obj(dict):
     instances = []
-    
+
     instancesXml = dict['application']['instance']
-    
+
     if not isinstance(instancesXml, list):
         instances.append(App(host=instancesXml['ipAddr'], port=instancesXml['port']['#text']))
-    
+
     else:
         for instanceXml in instancesXml:
             instances.append(App(host=instanceXml['ipAddr'], port=instanceXml['port']['#text']))
-        
+
     return instances
+
 
 def remove_own_instance(peers: list[App]):
     def is_own_instance(peer: App):
         return peer.host == OWN_HOST and peer.port == OWN_PORT
-    
+
     return [peer for peer in peers if not is_own_instance(peer)]
 
 
 def generate_toml_string(peers: list[App]):
-    str = 'peers = [{}]'
-    innerStr = []
-    
-    for peer in peers:
-        innerStr.append('\"tcp://{}:{}\"'.format(peer.host, peer.port))
-        
-    return str.format(', '.join(innerStr))     # remove last comma
+    def parse_peer_to_str(peer: App):
+        return f'\"tcp://{peer.host}:{peer.port}\"'
+
+    innerStr = ', '.join([parse_peer_to_str(peer) for peer in peers])
+
+    return f'peers = [{innerStr}]'
+
 
 def write_file(content: str, filename: str):
     with open(filename, 'w+') as file:
         file.write(content + '\n')
-    
+
+
 def parse_remote_url(host: str, app_id: str):
-    return "{}/eureka/v2/apps/{}".format(host, app_id)
+    return f'{host}/eureka/v2/apps/{app_id}'
 
 
 # ----------------------------------------------------------------------------------------------------- #
