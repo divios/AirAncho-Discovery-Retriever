@@ -10,24 +10,23 @@ OUTPUT_FILE = os.environ.get('OUTPUT_FILE', "validator.toml")
 OWN_HOST = os.environ.get('OWN_HOST', "localhost")
 OWN_PORT = os.environ.get('OWN_PORT', "8800")
 
+
 @dataclass
 class App(object):
     host: str
     port: str
 
-def parse_xml_to_obj(dict):
-    instances = []
 
-    instancesXml = dict['application']['instance']
+def parse_xml_to_obj(xml_dict):
+    def app_from_xml_entry(xmlEntry):
+        return App(host=xmlEntry['ipAddr'], port=xmlEntry['port']['#text'])
 
-    if not isinstance(instancesXml, list):
-        instances.append(App(host=instancesXml['ipAddr'], port=instancesXml['port']['#text']))
+    instances_xml = xml_dict['application']['instance']
 
-    else:
-        for instanceXml in instancesXml:
-            instances.append(App(host=instanceXml['ipAddr'], port=instanceXml['port']['#text']))
+    if not isinstance(instances_xml, list):      # If there is only one, wrap as list
+        instances_xml = [instances_xml]
 
-    return instances
+    return [app_from_xml_entry(instance_xml) for instance_xml in instances_xml]       # Parse xml to App
 
 
 def remove_own_instance(peers: list[App]):
@@ -54,8 +53,8 @@ def write_file(content: str, filename: str):
 def parse_remote_url(host: str, app_id: str):
     return f'{host}/eureka/v2/apps/{app_id}'
 
-
 # ----------------------------------------------------------------------------------------------------- #
+
 
 res = requests.get(parse_remote_url(REMOTE, APP_ID))
 if res.status_code == 404:
