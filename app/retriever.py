@@ -18,6 +18,18 @@ class App(object):
 
 
 def parse_xml_to_obj(xml_dict):
+    """
+    Converts a dictionary in XML format into a list of App objects.
+
+    Args:
+        dict (dict): A dictionary representing an XML file.
+
+    Returns:
+        list: A list of App objects.
+
+    Raises:
+        None
+    """
     def app_from_xml_entry(xmlEntry):
         return App(host=xmlEntry['ipAddr'], port=xmlEntry['port']['#text'])
 
@@ -30,6 +42,18 @@ def parse_xml_to_obj(xml_dict):
 
 
 def remove_own_instance(peers: list[App]):
+    """
+    Removes the own instance from the list of peers.
+
+    Args:
+        peers (list[App]): A list of App objects representing the instances.
+
+    Returns:
+        list[App]: A new list of App objects without the own instance.
+
+    Raises:
+        None
+    """
     def is_own_instance(peer: App):
         return peer.host == OWN_HOST and peer.port == OWN_PORT
 
@@ -37,6 +61,23 @@ def remove_own_instance(peers: list[App]):
 
 
 def generate_toml_string(peers: list[App]):
+    """
+    Generates a TOML string representation of the peers.
+
+    Args:
+        peers (list[App]): A list of App objects representing the peers.
+
+    Returns:
+        str: A TOML string representation of the peers.
+
+    Raises:
+        None
+
+    Examples:
+        >>> app_list = [App(host='127.0.0.1', port='8080'), App(host='192.168.1.1', port='8000')]
+        >>> generate_toml_string(app_list)
+        'peers = ["tcp://127.0.0.1:8080", "tcp://192.168.1.1:8000"]'
+    """
     def parse_peer_to_str(peer: App):
         return f'\"tcp://{peer.host}:{peer.port}\"'
 
